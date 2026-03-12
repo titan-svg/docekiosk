@@ -67,10 +67,10 @@ export default function ContagensPage() {
   const avgConsumption = totalCounts > 0 ? (totalConsumed / totalCounts).toFixed(2) : '0';
 
   return (
-    <div className="min-h-screen bg-pink-50">
+    <div className="min-h-screen bg-pink-50 lg:flex">
       <Sidebar />
 
-      <main className="lg:ml-[280px] p-4 lg:p-8">
+      <main className="flex-1 min-w-0 pt-14 lg:pt-0 p-4 lg:p-8">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
           <div>

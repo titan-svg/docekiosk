@@ -70,10 +70,10 @@ export default function RelatorioVendasPage() {
   const paymentTotal = Object.values(paymentMethods).reduce((a, b) => a + b, 0) || 1;
 
   return (
-    <div className="min-h-screen bg-pink-50">
+    <div className="min-h-screen bg-pink-50 lg:flex">
       <Sidebar />
 
-      <main className="lg:ml-[280px] p-4 lg:p-8">
+      <main className="flex-1 min-w-0 pt-14 lg:pt-0 p-4 lg:p-8">
         {/* Breadcrumb */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

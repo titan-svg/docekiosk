@@ -60,10 +60,10 @@ export default function FuncionariosPage() {
   const totalSalaries = filteredEmployees.reduce((sum, e) => sum + e.salary, 0);
 
   return (
-    <div className="min-h-screen bg-pink-50">
+    <div className="min-h-screen bg-pink-50 lg:flex">
       <Sidebar />
 
-      <main className="lg:ml-[280px] p-4 lg:p-8">
+      <main className="flex-1 min-w-0 pt-14 lg:pt-0 p-4 lg:p-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <motion.div

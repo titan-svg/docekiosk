@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -136,14 +137,22 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
+  const router = useRouter();
   const pathname = usePathname();
-  const { user, logout, hasPermission } = useAuth();
+  const { user, isLoading, logout, hasPermission } = useAuth();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [internalMobileOpen, setInternalMobileOpen] = useState(false);
 
   // Use external control if provided, otherwise use internal state
   const isMobileOpen = onMobileClose ? mobileOpen : internalMobileOpen;
   const closeMobile = onMobileClose || (() => setInternalMobileOpen(false));
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, isLoading, router]);
 
   // Auto-expand active parent on mount
   useEffect(() => {
@@ -154,6 +163,11 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
         );
       }
     });
+  }, [pathname]);
+
+  // Close mobile sidebar on route change
+  useEffect(() => {
+    closeMobile();
   }, [pathname]);
 
   const toggleExpanded = (name: string) => {
@@ -174,6 +188,15 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
   };
 
   const filteredNavigation = navigation.filter(canAccess);
+
+  // Show loading state
+  if (isLoading || !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-pink-50">
+        <div className="w-10 h-10 border-4 border-rose-200 border-t-rose-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
@@ -291,8 +314,8 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
 
   return (
     <>
-      {/* Mobile Header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-white border-b border-rose-100 shadow-sm">
+      {/* ========== MOBILE HEADER ========== */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-rose-100 shadow-sm">
         <div className="flex items-center justify-between px-4 h-14">
           <button
             onClick={() => setInternalMobileOpen(true)}
@@ -312,7 +335,7 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
         </div>
       </header>
 
-      {/* Mobile Sidebar Overlay */}
+      {/* ========== MOBILE SIDEBAR OVERLAY ========== */}
       <AnimatePresence>
         {isMobileOpen && (
           <>
@@ -321,7 +344,7 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={closeMobile}
-              className="lg:hidden fixed inset-0 z-40 bg-black/50"
+              className="lg:hidden fixed inset-0 z-50 bg-black/50"
             />
             <motion.aside
               initial={{ x: -300 }}
@@ -342,8 +365,11 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
         )}
       </AnimatePresence>
 
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:block fixed left-0 top-0 bottom-0 w-[260px] bg-white border-r border-rose-100 z-20">
+      {/* ========== DESKTOP SIDEBAR (sticky in flex layout) ========== */}
+      <aside
+        className="hidden lg:flex flex-col bg-white border-r border-rose-100 h-screen sticky top-0 shrink-0"
+        style={{ width: '260px' }}
+      >
         <SidebarContent />
       </aside>
     </>

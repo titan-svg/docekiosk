@@ -119,9 +119,9 @@ export default function EditProductPage() {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-pink-50">
+      <div className="min-h-screen bg-pink-50 lg:flex">
         <Sidebar />
-        <main className="lg:ml-[280px] p-4 lg:p-8">
+        <main className="flex-1 min-w-0 pt-14 lg:pt-0 p-4 lg:p-8">
           <div className="max-w-3xl mx-auto text-center py-12">
             <h1 className="text-2xl font-bold text-slate-800 mb-4">Produto nao encontrado</h1>
             <p className="text-slate-500 mb-6">O produto que voce esta procurando nao existe ou foi removido.</p>
@@ -207,10 +207,10 @@ export default function EditProductPage() {
     : mockSuppliers;
 
   return (
-    <div className="min-h-screen bg-pink-50">
+    <div className="min-h-screen bg-pink-50 lg:flex">
       <Sidebar />
 
-      <main className="lg:ml-[280px] p-4 lg:p-8">
+      <main className="flex-1 min-w-0 pt-14 lg:pt-0 p-4 lg:p-8">
         {/* Breadcrumb */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}

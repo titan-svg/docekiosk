@@ -48,9 +48,9 @@ export default function FuncionarioDetalhesPage() {
 
   if (!employee) {
     return (
-      <div className="min-h-screen bg-pink-50">
+      <div className="min-h-screen bg-pink-50 lg:flex">
         <Sidebar />
-        <main className="lg:ml-[280px] p-4 lg:p-8">
+        <main className="flex-1 min-w-0 pt-14 lg:pt-0 p-4 lg:p-8">
           <div className="text-center py-16">
             <EmployeeIcon className="w-16 h-16 text-slate-300 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-slate-600 mb-2">Funcionario nao encontrado</h2>
@@ -64,10 +64,10 @@ export default function FuncionarioDetalhesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-pink-50">
+    <div className="min-h-screen bg-pink-50 lg:flex">
       <Sidebar />
 
-      <main className="lg:ml-[280px] p-4 lg:p-8">
+      <main className="flex-1 min-w-0 pt-14 lg:pt-0 p-4 lg:p-8">
         {/* Breadcrumb */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

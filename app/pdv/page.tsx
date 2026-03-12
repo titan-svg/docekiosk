@@ -147,10 +147,10 @@ export default function PDVPage() {
   };
 
   return (
-    <div className="min-h-screen bg-pink-50">
+    <div className="min-h-screen bg-pink-50 lg:flex">
       <Sidebar />
 
-      <main className="lg:ml-[280px] p-4 lg:p-6">
+      <main className="flex-1 min-w-0 pt-14 lg:pt-0 p-4 lg:p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>

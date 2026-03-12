@@ -64,9 +64,9 @@ export default function VendaDetalhesPage() {
 
   if (!sale) {
     return (
-      <div className="min-h-screen bg-pink-50">
+      <div className="min-h-screen bg-pink-50 lg:flex">
         <Sidebar />
-        <main className="lg:ml-[280px] p-4 lg:p-8">
+        <main className="flex-1 min-w-0 pt-14 lg:pt-0 p-4 lg:p-8">
           <div className="bg-white rounded-xl p-8 text-center">
             <SalesIcon className="w-16 h-16 mx-auto mb-4 text-slate-300" />
             <h2 className="text-xl font-semibold text-slate-800 mb-2">Venda nao encontrada</h2>
@@ -86,10 +86,10 @@ export default function VendaDetalhesPage() {
   const saleDate = new Date(sale.createdAt);
 
   return (
-    <div className="min-h-screen bg-pink-50">
+    <div className="min-h-screen bg-pink-50 lg:flex">
       <Sidebar />
 
-      <main className="lg:ml-[280px] p-4 lg:p-8">
+      <main className="flex-1 min-w-0 pt-14 lg:pt-0 p-4 lg:p-8">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
           <Link href="/pdv/vendas" className="hover:text-rose-500 transition-colors">
