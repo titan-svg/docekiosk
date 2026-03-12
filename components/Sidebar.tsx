@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -130,11 +130,31 @@ const navigation: NavItem[] = [
   },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
+}
+
+export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
   const pathname = usePathname();
   const { user, logout, hasPermission } = useAuth();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [internalMobileOpen, setInternalMobileOpen] = useState(false);
+
+  // Use external control if provided, otherwise use internal state
+  const isMobileOpen = onMobileClose ? mobileOpen : internalMobileOpen;
+  const closeMobile = onMobileClose || (() => setInternalMobileOpen(false));
+
+  // Auto-expand active parent on mount
+  useEffect(() => {
+    navigation.forEach(item => {
+      if (item.children?.some(child => pathname.startsWith(child.href))) {
+        setExpandedItems(prev =>
+          prev.includes(item.name) ? prev : [...prev, item.name]
+        );
+      }
+    });
+  }, [pathname]);
 
   const toggleExpanded = (name: string) => {
     setExpandedItems(prev =>
@@ -156,21 +176,21 @@ export default function Sidebar() {
   const filteredNavigation = navigation.filter(canAccess);
 
   const SidebarContent = () => (
-    <>
+    <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-4 py-6 border-b border-rose-100">
-        <LogoIcon className="w-10 h-10" />
-        <div>
-          <h1 className="text-xl font-bold text-slate-800">DoceKiosk</h1>
-          <p className="text-xs text-slate-500">Self-Service Doces</p>
+      <div className="flex items-center gap-3 px-4 py-5 border-b border-rose-100 shrink-0">
+        <LogoIcon className="w-10 h-10 shrink-0" />
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold text-slate-800 truncate">DoceKiosk</h1>
+          <p className="text-xs text-slate-500 truncate">Self-Service Doces</p>
         </div>
       </div>
 
       {/* User Info */}
       {user && (
-        <div className="px-4 py-4 border-b border-rose-100">
+        <div className="px-4 py-4 border-b border-rose-100 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center text-white font-semibold">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center text-white font-semibold shrink-0">
               {user.name.charAt(0)}
             </div>
             <div className="flex-1 min-w-0">
@@ -196,11 +216,11 @@ export default function Sidebar() {
                   }`}
                 >
                   <span className="flex items-center gap-3">
-                    <item.icon className="w-5 h-5" />
-                    {item.name}
+                    <item.icon className="w-5 h-5 shrink-0" />
+                    <span className="truncate">{item.name}</span>
                   </span>
                   <ChevronDownIcon
-                    className={`w-4 h-4 transition-transform ${
+                    className={`w-4 h-4 shrink-0 transition-transform ${
                       expandedItems.includes(item.name) ? 'rotate-180' : ''
                     }`}
                   />
@@ -219,15 +239,15 @@ export default function Sidebar() {
                           <Link
                             key={child.href}
                             href={child.href}
-                            onClick={() => setMobileOpen(false)}
+                            onClick={closeMobile}
                             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                               isActive(child.href)
                                 ? 'bg-rose-500 text-white'
                                 : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800'
                             }`}
                           >
-                            <child.icon className="w-4 h-4" />
-                            {child.name}
+                            <child.icon className="w-4 h-4 shrink-0" />
+                            <span className="truncate">{child.name}</span>
                           </Link>
                         ))}
                       </div>
@@ -238,15 +258,15 @@ export default function Sidebar() {
             ) : (
               <Link
                 href={item.href!}
-                onClick={() => setMobileOpen(false)}
+                onClick={closeMobile}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive(item.href!)
                     ? 'bg-rose-500 text-white'
                     : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800'
                 }`}
               >
-                <item.icon className="w-5 h-5" />
-                {item.name}
+                <item.icon className="w-5 h-5 shrink-0" />
+                <span className="truncate">{item.name}</span>
               </Link>
             )}
           </div>
@@ -254,49 +274,65 @@ export default function Sidebar() {
       </nav>
 
       {/* Logout */}
-      <div className="px-3 py-4 border-t border-rose-100">
+      <div className="px-3 py-4 border-t border-rose-100 shrink-0">
         <button
-          onClick={logout}
+          onClick={() => {
+            closeMobile();
+            logout();
+          }}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors"
         >
-          <LogoutIcon className="w-5 h-5" />
-          Sair
+          <LogoutIcon className="w-5 h-5 shrink-0" />
+          <span>Sair</span>
         </button>
       </div>
-    </>
+    </div>
   );
 
   return (
     <>
-      {/* Mobile Menu Button */}
-      <button
-        onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-40 p-2 bg-white rounded-lg shadow-md text-slate-600"
-      >
-        <MenuIcon className="w-6 h-6" />
-      </button>
+      {/* Mobile Header */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-white border-b border-rose-100 shadow-sm">
+        <div className="flex items-center justify-between px-4 h-14">
+          <button
+            onClick={() => setInternalMobileOpen(true)}
+            className="p-2 -ml-2 text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
+          >
+            <MenuIcon className="w-6 h-6" />
+          </button>
 
-      {/* Mobile Sidebar */}
+          <Link href="/dashboard" className="flex items-center gap-2">
+            <LogoIcon className="w-8 h-8" />
+            <span className="font-bold text-slate-800">DoceKiosk</span>
+          </Link>
+
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center text-white text-sm font-semibold">
+            {user?.name.charAt(0)}
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile Sidebar Overlay */}
       <AnimatePresence>
-        {mobileOpen && (
+        {isMobileOpen && (
           <>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setMobileOpen(false)}
+              onClick={closeMobile}
               className="lg:hidden fixed inset-0 z-40 bg-black/50"
             />
             <motion.aside
-              initial={{ x: -280 }}
+              initial={{ x: -300 }}
               animate={{ x: 0 }}
-              exit={{ x: -280 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="lg:hidden fixed left-0 top-0 bottom-0 z-50 w-[280px] bg-white flex flex-col shadow-xl"
+              exit={{ x: -300 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 250 }}
+              className="lg:hidden fixed left-0 top-0 bottom-0 z-50 w-[280px] max-w-[85vw] bg-white shadow-xl"
             >
               <button
-                onClick={() => setMobileOpen(false)}
-                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600"
+                onClick={closeMobile}
+                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors z-10"
               >
                 <XIcon className="w-5 h-5" />
               </button>
@@ -307,7 +343,7 @@ export default function Sidebar() {
       </AnimatePresence>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-[280px] bg-white border-r border-rose-100 flex-col">
+      <aside className="hidden lg:block fixed left-0 top-0 bottom-0 w-[280px] bg-white border-r border-rose-100 z-20">
         <SidebarContent />
       </aside>
     </>
