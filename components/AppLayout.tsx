@@ -327,7 +327,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </AnimatePresence>
 
       {/* ========== DESKTOP SIDEBAR (FIXED) ========== */}
-      <aside className="hidden lg:flex fixed top-0 left-0 bottom-0 w-64 bg-white border-r border-rose-100 flex-col z-30">
+      <aside className="hidden lg:flex fixed top-0 left-0 bottom-0 w-[260px] bg-white border-r border-rose-100 flex-col z-30">
         <div className="flex items-center gap-3 p-4 border-b border-rose-100">
           <LogoIcon className="w-10 h-10" />
           <div>
@@ -429,7 +429,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
       {/* ========== MAIN CONTENT AREA ========== */}
       {/* This is completely separate from the sidebar */}
-      <div className="lg:ml-64">
+      <div className="lg:ml-[260px]">
         {/* Spacer for mobile header */}
         <div className="h-14 lg:hidden" />
 

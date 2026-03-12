@@ -36,7 +36,7 @@ export default function PageWrapper({ children }: PageWrapperProps) {
       />
 
       {/* Main Content - responsive padding for mobile header and desktop sidebar */}
-      <main className="pt-14 lg:pt-0 lg:ml-[280px] min-h-screen">
+      <main className="pt-14 lg:pt-0 lg:ml-[260px] min-h-screen">
         <div className="p-4 sm:p-6 lg:p-8">
           {children}
         </div>

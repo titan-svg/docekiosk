@@ -328,7 +328,7 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
               animate={{ x: 0 }}
               exit={{ x: -300 }}
               transition={{ type: 'spring', damping: 25, stiffness: 250 }}
-              className="lg:hidden fixed left-0 top-0 bottom-0 z-50 w-[280px] max-w-[85vw] bg-white shadow-xl"
+              className="lg:hidden fixed left-0 top-0 bottom-0 z-50 w-[260px] max-w-[85vw] bg-white shadow-xl"
             >
               <button
                 onClick={closeMobile}
@@ -343,7 +343,7 @@ export default function Sidebar({ mobileOpen = false, onMobileClose }: SidebarPr
       </AnimatePresence>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:block fixed left-0 top-0 bottom-0 w-[280px] bg-white border-r border-rose-100 z-20">
+      <aside className="hidden lg:block fixed left-0 top-0 bottom-0 w-[260px] bg-white border-r border-rose-100 z-20">
         <SidebarContent />
       </aside>
     </>
