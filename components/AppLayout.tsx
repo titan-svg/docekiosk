@@ -179,9 +179,112 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   const filteredNavigation = navigation.filter(canAccess);
 
+  // Sidebar content component to avoid duplication
+  const SidebarContent = () => (
+    <>
+      <div className="flex items-center gap-3 p-4 border-b border-rose-100">
+        <LogoIcon className="w-10 h-10 flex-shrink-0" />
+        <div>
+          <h1 className="text-lg font-bold text-slate-800">DoceKiosk</h1>
+          <p className="text-xs text-slate-500">Self-Service Doces</p>
+        </div>
+      </div>
+
+      <div className="p-4 border-b border-rose-100">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center text-white font-semibold flex-shrink-0">
+            {user.name.charAt(0)}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-slate-800 truncate">{user.name}</p>
+            <p className="text-xs text-slate-500 capitalize">{user.role}</p>
+          </div>
+        </div>
+      </div>
+
+      <nav className="flex-1 p-3 overflow-y-auto">
+        {filteredNavigation.map(item => (
+          <div key={item.name} className="mb-1">
+            {item.children ? (
+              <>
+                <button
+                  onClick={() => toggleExpanded(item.name)}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium ${
+                    isParentActive(item.children)
+                      ? 'bg-rose-50 text-rose-600'
+                      : 'text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  <span className="flex items-center gap-3">
+                    <item.icon className="w-5 h-5 flex-shrink-0" />
+                    <span className="truncate">{item.name}</span>
+                  </span>
+                  <ChevronDownIcon
+                    className={`w-4 h-4 flex-shrink-0 transition-transform ${
+                      expandedItems.includes(item.name) ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+                <AnimatePresence>
+                  {expandedItems.includes(item.name) && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pl-4 mt-1 space-y-1">
+                        {item.children.map(child => (
+                          <Link
+                            key={child.href}
+                            href={child.href}
+                            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm ${
+                              isActive(child.href)
+                                ? 'bg-rose-500 text-white'
+                                : 'text-slate-600 hover:bg-slate-50'
+                            }`}
+                          >
+                            <child.icon className="w-4 h-4 flex-shrink-0" />
+                            <span className="truncate">{child.name}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </>
+            ) : (
+              <Link
+                href={item.href!}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium ${
+                  isActive(item.href!)
+                    ? 'bg-rose-500 text-white'
+                    : 'text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                <item.icon className="w-5 h-5 flex-shrink-0" />
+                <span className="truncate">{item.name}</span>
+              </Link>
+            )}
+          </div>
+        ))}
+      </nav>
+
+      <div className="p-3 border-t border-rose-100">
+        <button
+          onClick={logout}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-red-50 hover:text-red-600"
+        >
+          <LogoutIcon className="w-5 h-5 flex-shrink-0" />
+          <span>Sair</span>
+        </button>
+      </div>
+    </>
+  );
+
   return (
     <div className="min-h-screen bg-pink-50">
-      {/* ========== MOBILE HEADER ========== */}
+      {/* ========== MOBILE HEADER (only visible on mobile) ========== */}
       <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-white border-b border-rose-100 shadow-sm z-40 flex items-center justify-between px-4">
         <button
           onClick={() => setSidebarOpen(true)}
@@ -216,225 +319,41 @@ export default function AppLayout({ children }: AppLayoutProps) {
               transition={{ type: 'spring', damping: 25, stiffness: 250 }}
               className="lg:hidden fixed top-0 left-0 bottom-0 w-72 max-w-[85vw] bg-white z-50 flex flex-col shadow-xl"
             >
-              <div className="flex items-center justify-between p-4 border-b border-rose-100">
-                <div className="flex items-center gap-3">
-                  <LogoIcon className="w-10 h-10" />
-                  <div>
-                    <h1 className="text-lg font-bold text-slate-800">DoceKiosk</h1>
-                    <p className="text-xs text-slate-500">Self-Service Doces</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setSidebarOpen(false)}
-                  className="p-2 rounded-lg text-slate-400 hover:bg-slate-100"
-                >
-                  <XIcon className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="p-4 border-b border-rose-100">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center text-white font-semibold">
-                    {user.name.charAt(0)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-800 truncate">{user.name}</p>
-                    <p className="text-xs text-slate-500 capitalize">{user.role}</p>
-                  </div>
-                </div>
-              </div>
-
-              <nav className="flex-1 p-3 overflow-y-auto">
-                {filteredNavigation.map(item => (
-                  <div key={item.name} className="mb-1">
-                    {item.children ? (
-                      <>
-                        <button
-                          onClick={() => toggleExpanded(item.name)}
-                          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium ${
-                            isParentActive(item.children)
-                              ? 'bg-rose-50 text-rose-600'
-                              : 'text-slate-600 hover:bg-slate-50'
-                          }`}
-                        >
-                          <span className="flex items-center gap-3">
-                            <item.icon className="w-5 h-5" />
-                            {item.name}
-                          </span>
-                          <ChevronDownIcon
-                            className={`w-4 h-4 transition-transform ${
-                              expandedItems.includes(item.name) ? 'rotate-180' : ''
-                            }`}
-                          />
-                        </button>
-                        <AnimatePresence>
-                          {expandedItems.includes(item.name) && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              className="overflow-hidden"
-                            >
-                              <div className="pl-4 mt-1 space-y-1">
-                                {item.children.map(child => (
-                                  <Link
-                                    key={child.href}
-                                    href={child.href}
-                                    className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm ${
-                                      isActive(child.href)
-                                        ? 'bg-rose-500 text-white'
-                                        : 'text-slate-600 hover:bg-slate-50'
-                                    }`}
-                                  >
-                                    <child.icon className="w-4 h-4" />
-                                    {child.name}
-                                  </Link>
-                                ))}
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </>
-                    ) : (
-                      <Link
-                        href={item.href!}
-                        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium ${
-                          isActive(item.href!)
-                            ? 'bg-rose-500 text-white'
-                            : 'text-slate-600 hover:bg-slate-50'
-                        }`}
-                      >
-                        <item.icon className="w-5 h-5" />
-                        {item.name}
-                      </Link>
-                    )}
-                  </div>
-                ))}
-              </nav>
-
-              <div className="p-3 border-t border-rose-100">
-                <button
-                  onClick={logout}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-red-50 hover:text-red-600"
-                >
-                  <LogoutIcon className="w-5 h-5" />
-                  Sair
-                </button>
-              </div>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="absolute top-4 right-4 p-2 rounded-lg text-slate-400 hover:bg-slate-100 z-10"
+              >
+                <XIcon className="w-5 h-5" />
+              </button>
+              <SidebarContent />
             </motion.aside>
           </>
         )}
       </AnimatePresence>
 
-      {/* ========== DESKTOP SIDEBAR (FIXED) ========== */}
-      <aside className="hidden lg:flex fixed top-0 left-0 bottom-0 w-[260px] bg-white border-r border-rose-100 flex-col z-30">
-        <div className="flex items-center gap-3 p-4 border-b border-rose-100">
-          <LogoIcon className="w-10 h-10" />
-          <div>
-            <h1 className="text-lg font-bold text-slate-800">DoceKiosk</h1>
-            <p className="text-xs text-slate-500">Self-Service Doces</p>
-          </div>
-        </div>
+      {/* ========== DESKTOP LAYOUT: Flexbox with sidebar and main content ========== */}
+      <div className="hidden lg:flex min-h-screen">
+        {/* Desktop Sidebar - using sticky positioning */}
+        <aside
+          className="flex-shrink-0 bg-white border-r border-rose-100 flex flex-col h-screen sticky top-0"
+          style={{ width: '260px' }}
+        >
+          <SidebarContent />
+        </aside>
 
-        <div className="p-4 border-b border-rose-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center text-white font-semibold">
-              {user.name.charAt(0)}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-slate-800 truncate">{user.name}</p>
-              <p className="text-xs text-slate-500 capitalize">{user.role}</p>
-            </div>
-          </div>
-        </div>
+        {/* Main Content - takes remaining space */}
+        <main className="flex-1 min-w-0 p-6 lg:p-8">
+          {children}
+        </main>
+      </div>
 
-        <nav className="flex-1 p-3 overflow-y-auto">
-          {filteredNavigation.map(item => (
-            <div key={item.name} className="mb-1">
-              {item.children ? (
-                <>
-                  <button
-                    onClick={() => toggleExpanded(item.name)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium ${
-                      isParentActive(item.children)
-                        ? 'bg-rose-50 text-rose-600'
-                        : 'text-slate-600 hover:bg-slate-50'
-                    }`}
-                  >
-                    <span className="flex items-center gap-3">
-                      <item.icon className="w-5 h-5" />
-                      {item.name}
-                    </span>
-                    <ChevronDownIcon
-                      className={`w-4 h-4 transition-transform ${
-                        expandedItems.includes(item.name) ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </button>
-                  <AnimatePresence>
-                    {expandedItems.includes(item.name) && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="pl-4 mt-1 space-y-1">
-                          {item.children.map(child => (
-                            <Link
-                              key={child.href}
-                              href={child.href}
-                              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm ${
-                                isActive(child.href)
-                                  ? 'bg-rose-500 text-white'
-                                  : 'text-slate-600 hover:bg-slate-50'
-                              }`}
-                            >
-                              <child.icon className="w-4 h-4" />
-                              {child.name}
-                            </Link>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </>
-              ) : (
-                <Link
-                  href={item.href!}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium ${
-                    isActive(item.href!)
-                      ? 'bg-rose-500 text-white'
-                      : 'text-slate-600 hover:bg-slate-50'
-                  }`}
-                >
-                  <item.icon className="w-5 h-5" />
-                  {item.name}
-                </Link>
-              )}
-            </div>
-          ))}
-        </nav>
+      {/* ========== MOBILE LAYOUT: Simple stacked layout ========== */}
+      <div className="lg:hidden">
+        {/* Spacer for fixed mobile header */}
+        <div className="h-14" />
 
-        <div className="p-3 border-t border-rose-100">
-          <button
-            onClick={logout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-red-50 hover:text-red-600"
-          >
-            <LogoutIcon className="w-5 h-5" />
-            Sair
-          </button>
-        </div>
-      </aside>
-
-      {/* ========== MAIN CONTENT AREA ========== */}
-      {/* This is completely separate from the sidebar */}
-      <div className="lg:ml-[260px]">
-        {/* Spacer for mobile header */}
-        <div className="h-14 lg:hidden" />
-
-        {/* Main content */}
-        <main className="min-h-screen p-4 sm:p-6 lg:p-8">
+        {/* Mobile main content */}
+        <main className="p-4 sm:p-6">
           {children}
         </main>
       </div>
